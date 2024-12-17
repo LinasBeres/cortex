@@ -92,7 +92,6 @@ ClientDisplayDriver::ClientDisplayDriver( const Imath::Box2i &displayWindow, con
 	// expects three custom StringData parameters : displayHost, displayPort and displayType
 	const StringData *displayHostData = parameters->member<StringData>( "displayHost", true /* throw if missing */ );
 	const StringData *displayPortData = parameters->member<StringData>( "displayPort", true /* throw if missing */ );
-	const BoolData *mergeDriverData = parameters->member<BoolData>( "mergeDriver", false /* throw if missing */ );
 
 	m_data->m_host = displayHostData->readable();
 	m_data->m_port = displayPortData->readable();
@@ -123,19 +122,11 @@ ClientDisplayDriver::ClientDisplayDriver( const Imath::Box2i &displayWindow, con
 	StringVectorDataPtr channelNamesData = new StringVectorData( channelNames );
 
 	IECore::CompoundDataPtr tmpParameters = parameters->copy();
-	if (mergeDriverData && mergeDriverData->readable())
-	{
-		const IntData *sessionIdData = parameters->member<IntData>( "sessionId", true /* throw if missing */ );
-		tmpParameters->writable()[ "clientPID" ] = new IntData( sessionIdData->readable() );
-	}
-	else
-	{
 #ifndef _MSC_VER
-		tmpParameters->writable()[ "clientPID" ] = new IntData( getpid() );
+	tmpParameters->writable()[ "clientPID" ] = new IntData( getpid() );
 #else
-		tmpParameters->writable()[ "clientPID" ] = new IntData( _getpid() );
+	tmpParameters->writable()[ "clientPID" ] = new IntData( _getpid() );
 #endif
-	}
 
 	// build the data block
 	io = new MemoryIndexedIO( ConstCharVectorDataPtr(), IndexedIO::rootPath, IndexedIO::Exclusive | IndexedIO::Write );
