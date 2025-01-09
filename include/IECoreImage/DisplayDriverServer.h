@@ -67,6 +67,14 @@ class IECOREIMAGE_API DisplayDriverServer : public IECore::RunTimeTyped
 		using Port = int;
 #endif
 
+		struct MergeDriverInfo
+		{
+			DisplayDriverPtr mergeDriver = nullptr;
+			int mergeCount = 0;
+		};
+
+		using MergeMap = std::map<int, MergeDriverInfo>;
+
 		using PortRange = std::pair<Port, Port>;
 
 		/// A port number of 0 causes a free port to be chosen
@@ -90,6 +98,10 @@ class IECOREIMAGE_API DisplayDriverServer : public IECore::RunTimeTyped
 		static void registerPortRange( const std::string &name, const PortRange &range );
 		static void deregisterPortRange( const std::string &name );
 		static const PortRange &registeredPortRange( const std::string &name );
+
+		// Get the number of merge drivers associated with
+		// the current merge id.
+		static const MergeDriverInfo &getMergeDriverInfo( int mergeId );
 
 	private:
 

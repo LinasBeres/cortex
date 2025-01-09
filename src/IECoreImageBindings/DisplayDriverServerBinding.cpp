@@ -72,6 +72,12 @@ boost::python::tuple registeredPortRange( const std::string &name )
 	return boost::python::make_tuple( range.first, range.second );
 }
 
+boost::python::tuple getMergeDriverInfo( int mergeId )
+{
+	auto mergeDriverInfo = DisplayDriverServer::getMergeDriverInfo( mergeId );
+	return boost::python::make_tuple( mergeDriverInfo.mergeDriver, mergeDriverInfo.mergeCount );
+}
+
 } // namespace
 
 namespace IECoreImageBindings
@@ -89,6 +95,7 @@ void bindDisplayDriverServer()
 		.def( "registerPortRange", &::registerPortRange ).staticmethod( "registerPortRange" )
 		.def( "deregisterPortRange", &DisplayDriverServer::deregisterPortRange ).staticmethod( "deregisterPortRange" )
 		.def( "registeredPortRange", &registeredPortRange ).staticmethod( "registeredPortRange" )
+		.def( "getMergeDriverInfo", &getMergeDriverInfo).staticmethod( "getMergeDriverInfo" )
 	;
 
 }

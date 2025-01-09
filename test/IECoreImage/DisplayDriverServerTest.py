@@ -34,6 +34,7 @@
 
 import unittest
 import sys
+import imath
 
 import IECore
 import IECoreImage
@@ -117,6 +118,47 @@ class DisplayDriverServerTest( unittest.TestCase ) :
 		IECoreImage.DisplayDriverServer.setPortRange( IECoreImage.DisplayDriverServer.registeredPortRange( "b" ) )
 		s2 = IECoreImage.DisplayDriverServer()
 		self.assertEqual( s2.portNumber(), 45021 )
+
+	def testMergeMap( self ) :
+		server = IECoreImage.DisplayDriverServer( 45001 )
+
+		displayWindow = imath.Box2i( imath.V2i(0,0), imath.V2i(100,100) )
+		dataWindow = imath.Box2i( imath.V2i(0,0), imath.V2i(100,100) )
+
+		params = IECore.CompoundData()
+		params['displayHost'] = IECore.StringData('localhost')
+		params['displayPort'] = IECore.StringData( '45001' )
+		params['displayDriverServer:mergeId'] = IECore.IntData( 42 )
+		params['displayDriverServer:mergeClients'] = IECore.IntData( 2 )
+		params["remoteDisplayType"] = IECore.StringData( "ImageDisplayDriver" )
+
+		idd1 = IECoreImage.ClientDisplayDriver( displayWindow, dataWindow, list( ["R", "G"] ), params )
+		idd2 = IECoreImage.ClientDisplayDriver( displayWindow, dataWindow, list( ["R", "G"] ), params )
+
+		params['displayDriverServer:mergeId'] = IECore.IntData( 666 )
+		params['displayDriverServer:mergeClients'] = IECore.IntData( 1 )
+		idd3 = IECoreImage.ClientDisplayDriver( displayWindow, dataWindow, list( ["R", "G"] ), params )
+
+		# Test that the merge map has merge id 42 and that there are two clients
+		mergeDriverInfo = IECoreImage.DisplayDriverServer.getMergeDriverInfo( 42 )
+		self.assertEqual( mergeDriverInfo[1], 2 )
+
+		# Test that a new merge driver with a new id creates a new display driver
+		mergeDriverInfo2 = IECoreImage.DisplayDriverServer.getMergeDriverInfo( 666 )
+		self.assertNotEqual( mergeDriverInfo[0], mergeDriverInfo2[0] )
+
+		# Test that one image close will remove one client from the merge map
+		idd1.imageClose()
+		mergeDriverInfo = IECoreImage.DisplayDriverServer.getMergeDriverInfo( 42 )
+		self.assertEqual( mergeDriverInfo[1], 1 )
+
+		# Test that after the last image close no clients are left in the map
+		idd2.imageClose()
+		self.assertRaises( RuntimeError, lambda : IECoreImage.DisplayDriverServer.getMergeDriverInfo( 42 ) )
+
+		idd3.imageClose()
+
+		server = None
 
 if __name__ == "__main__":
 	unittest.main()

@@ -73,13 +73,7 @@ IE_CORE_DEFINERUNTIMETYPED( DisplayDriverServer );
 namespace
 {
 
-struct MergeDriverInfo
-{
-	DisplayDriverPtr mergeDriver = nullptr;
-	int mergeCount = 0;
-};
-
-std::map<int, MergeDriverInfo> g_mergeMap;
+static DisplayDriverServer::MergeMap g_mergeMap;
 
 /* Set the FD_CLOEXEC flag for the given socket descriptor, so that it will not exist on child processes.*/
 static void fixSocketFlags( int socketDesc )
@@ -266,6 +260,17 @@ const DisplayDriverServer::PortRange &DisplayDriverServer::registeredPortRange( 
 	if( it == g_portRegistry.end() )
 	{
 		throw IECore::InvalidArgumentException( "DisplayDriverServer::registerPortRange : " + name + " is not registered." );
+	}
+
+	return it->second;
+}
+
+const DisplayDriverServer::MergeDriverInfo &DisplayDriverServer::getMergeDriverInfo( int mergeId )
+{
+	auto it = g_mergeMap.find( mergeId );
+	if( it == g_mergeMap.end() )
+	{
+		throw IECore::InvalidArgumentException( "DisplayDriverServer::getMergeCount : " + std::to_string(mergeId) + " is not in the merge map." );
 	}
 
 	return it->second;
