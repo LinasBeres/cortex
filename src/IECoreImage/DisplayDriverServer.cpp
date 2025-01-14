@@ -73,7 +73,7 @@ IE_CORE_DEFINERUNTIMETYPED( DisplayDriverServer );
 namespace
 {
 
-static DisplayDriverServer::MergeMap g_mergeMap;
+DisplayDriverServer::MergeMap g_mergeMap;
 
 /* Set the FD_CLOEXEC flag for the given socket descriptor, so that it will not exist on child processes.*/
 static void fixSocketFlags( int socketDesc )
