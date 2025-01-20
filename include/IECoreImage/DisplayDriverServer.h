@@ -99,12 +99,7 @@ class IECOREIMAGE_API DisplayDriverServer : public IECore::RunTimeTyped
 		static void deregisterPortRange( const std::string &name );
 		static const PortRange &registeredPortRange( const std::string &name );
 
-		// Get the number of merge drivers associated with
-		// the current merge id.
-		static const MergeDriverInfo &getMergeDriverInfo( int mergeId );
-
 	private:
-
 		// Session class
 		// Takes care of one client connection.
 		class Session;
@@ -116,6 +111,8 @@ class IECOREIMAGE_API DisplayDriverServer : public IECore::RunTimeTyped
 		class PrivateData;
 		IE_CORE_DECLAREPTR( PrivateData );
 		PrivateDataPtr m_data;
+
+		MergeMap m_mergeMap;
 };
 
 IE_CORE_DECLAREPTR( DisplayDriverServer )

@@ -161,23 +161,8 @@ class DisplayDriverServerTest( unittest.TestCase ) :
 			idd2.imageData( imath.Box2i( imath.V2i( img.dataWindow.min().x, i + img.dataWindow.min().y ), imath.V2i( img.dataWindow.max().x, i + img.dataWindow.min().y) ), buf )
 			idd3.imageData( imath.Box2i( imath.V2i( img.dataWindow.min().x, i + img.dataWindow.min().y ), imath.V2i( img.dataWindow.max().x, i + img.dataWindow.min().y) ), buf )
 
-		# Test that the merge map has merge id 42 and that there are two clients
-		mergeDriverInfo = IECoreImage.DisplayDriverServer.getMergeDriverInfo( 42 )
-		self.assertEqual( mergeDriverInfo[1], 2 )
-
-		# Test that a new merge driver with a new id creates a new display driver
-		mergeDriverInfo2 = IECoreImage.DisplayDriverServer.getMergeDriverInfo( 666 )
-		self.assertNotEqual( mergeDriverInfo[0], mergeDriverInfo2[0] )
-
-		# Test that one image close will remove one client from the merge map
 		idd1.imageClose()
-		mergeDriverInfo = IECoreImage.DisplayDriverServer.getMergeDriverInfo( 42 )
-		self.assertEqual( mergeDriverInfo[1], 1 )
-
-		# Test that after the last image close no clients are left in the map
 		idd2.imageClose()
-		self.assertRaises( RuntimeError, lambda : IECoreImage.DisplayDriverServer.getMergeDriverInfo( 42 ) )
-
 		idd3.imageClose()
 
 		newImg = IECoreImage.ImageDisplayDriver.removeStoredImage( "myHandle1" )
